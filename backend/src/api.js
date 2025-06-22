@@ -1,6 +1,5 @@
 //BACKEND/api.js
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const {
     authUser,
     serializeUser,
@@ -15,8 +14,10 @@ const {
     getPostById,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    setSelectedChannel
 } = require('./utils');
+const {Channel} = require("./db");
 
 // const { LoremIpsum } = require('lorem-ipsum');
 // const lorem = new LoremIpsum({
@@ -200,13 +201,52 @@ router.get('/pages', async (req, res) => {
     }
 });
 
+router.get('/channels', async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized. Please log in.' });
+        }
+        const channels = await Channel.findAll({
+            attributes: ['ID', 'name'],
+            order: [['name', 'ASC']]
+        });
+        res.json(channels.map(channel => channel.toJSON()));
+    } catch (err) {
+        console.error('Error fetching channels:', err);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+router.post('/select-channel', async (req, res) => {
+    try {
+        const { user, channelId } = req.body;
+        if (!user) {
+            return res.status(400).json({ message: 'User is required.' });
+        }
+        // channelId może być null (dla "Wszystkie kanały") lub liczbą
+        if (channelId !== null && (isNaN(channelId) || channelId <= 0)) {
+            return res.status(400).json({ message: 'Invalid channel ID.' });
+        }
+        const success = await setSelectedChannel(user, channelId ? parseInt(channelId) : null);
+        if (success) {
+            req.session.user.selected_channel = channelId ? parseInt(channelId) : null;
+            res.json({ success: true, selectedChannel: channelId });
+        } else {
+            res.status(500).json({ success: false, message: 'Failed to update selected channel.' });
+        }
+    } catch (err) {
+        console.error('Error selecting channel:', err);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+});
+
 router.get('/posts', async (req, res) => {
     try {
         if (!req.session.user) {
             return res.status(401).json({ message: 'Unauthorized. Please log in.' });
         }
-
-        const posts = await getAllPosts();
+        const user = req.session.user;
+        const posts = await getAllPosts(user.selected_channel);
         res.json(posts);
     } catch (err) {
         console.error('Error fetching posts:', err);

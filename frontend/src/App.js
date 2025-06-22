@@ -266,7 +266,7 @@ const App = () => {
                             .filter((page) => user.role >= page.minRole)
                             .map((page) => (
                                 <Route key={page.path} path={page.path}>
-                                    <Route index element={page.component ? <page.component /> : <NotFound />} />
+                                    <Route index element={page.component ? <page.component user={user}/> : <NotFound />} />
                                     {page.subpages
                                         .filter((subpage) => user.role >= subpage.minRole)
                                         .map((subpage) => (
@@ -281,7 +281,7 @@ const App = () => {
                                     {page.path === 'posts' && (
                                         <Route
                                             path=":postId"
-                                            element={<PostsIndex />}
+                                            element={<PostsIndex user={user} />}
                                         />
                                     )}
                                 </Route>

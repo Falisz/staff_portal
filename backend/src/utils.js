@@ -40,6 +40,7 @@ function serializeUser(user) {
         role: user.role,
         manager_nav_collapsed: user.manager_nav_collapsed,
         manager_view: user.manager_view_enabled,
+        selected_channel: user.selected_channel
     };
 }
 
@@ -170,9 +171,11 @@ function logoutUser(req, res) {
         res.json({ message: 'Logged out' });
     });
 }
-async function getAllPosts() {
+async function getAllPosts(channelId = null) {
     try {
+        const where = channelId ? { channelID: channelId } : {};
         const posts = await Post.findAll({
+            where,
             include: [
                 { model: User, attributes: ['ID', 'first_name', 'last_name'] },
                 { model: Channel, attributes: ['ID', 'name'] }
@@ -264,6 +267,19 @@ async function deletePost(postId) {
     }
 }
 
+async function setSelectedChannel(user, channelId) {
+    try {
+        const [updated] = await User.update(
+            { selected_channel: channelId },
+            { where: { ID: user.ID } }
+        );
+        return updated === 1;
+    } catch (err) {
+        console.error(`Error updating selected channel for userID: ${user.ID}`, err);
+        return false;
+    }
+}
+
 module.exports = {
     authUser,
     serializeUser,
@@ -278,5 +294,6 @@ module.exports = {
     getPostById,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    setSelectedChannel
 };

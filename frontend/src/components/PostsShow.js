@@ -50,7 +50,7 @@ const PostsShow = ({ postId, onClose }) => {
         <>
             <div className="post-modal-overlay" onClick={onClose}></div>
             <div className="post-modal-content">
-                <h1>{post.title || 'Untitled Post'}</h1>
+                {post.title && <h1>{post.title}</h1>}
                 <p>Posted by {post.User.first_name} {post.User.last_name}</p>
                 <p>Channel: {post.Channel.name}</p>
                 <p>

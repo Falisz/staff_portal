@@ -9,7 +9,8 @@ const { sequelize, seedData } = require('./db');
 
 const validateEnv = () => {
     const requiredEnvVars = [
-        'SESSION_SECRET', 'PORT',
+        'SESSION_SECRET',
+        'PORT',
         'DB_DIALECT',
         'DB_HOST',
         'DB_PORT',

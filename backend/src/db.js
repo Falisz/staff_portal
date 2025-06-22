@@ -22,39 +22,44 @@ const User = sequelize.define('User', {
         defaultValue: () => Math.floor(Math.random() * 900000) + 100000
     },
     first_name: {
-        type: DataTypes.STRING(50), // varchar(50)
+        type: DataTypes.STRING(50),
         allowNull: false
     },
     last_name: {
-        type: DataTypes.STRING(50), // varchar(50)
+        type: DataTypes.STRING(50),
         allowNull: false
     },
     email: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     role: {
-        type: DataTypes.INTEGER, // integer
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     active: {
-        type: DataTypes.BOOLEAN, // boolean
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true
     },
     manager_view_enabled: {
-        type: DataTypes.BOOLEAN, // boolean
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
     },
     manager_nav_collapsed: {
-        type: DataTypes.BOOLEAN, // boolean
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
     },
     password: {
-        type: DataTypes.STRING(200), // varchar(200)
+        type: DataTypes.STRING(200),
         allowNull: false
+    },
+    selected_channel: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
     }
 }, {
     tableName: 'users',
@@ -72,7 +77,7 @@ const Project = sequelize.define('Project', {
         allowNull: true
     },
     name: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     }
 }, {
@@ -95,7 +100,7 @@ const Team = sequelize.define('Team', {
         allowNull: true
     },
     name: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     }
 }, {
@@ -114,23 +119,23 @@ const PagesStaff = sequelize.define('PagesStaff', {
         allowNull: true
     },
     path: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     title: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     min_role: {
-        type: DataTypes.INTEGER, // integer
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     component: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: true
     },
     icon: {
-        type: DataTypes.STRING(50), // varchar(50)
+        type: DataTypes.STRING(50),
         allowNull: true
     }
 }, {
@@ -149,23 +154,23 @@ const PagesManager = sequelize.define('PagesManager', {
         allowNull: true
     },
     path: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     title: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     min_role: {
-        type: DataTypes.INTEGER, // integer
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     component: {
-        type: DataTypes.STRING(100), // varchar(100)
+        type: DataTypes.STRING(100),
         allowNull: true
     },
     icon: {
-        type: DataTypes.STRING(50), // varchar(50)
+        type: DataTypes.STRING(50),
         allowNull: true
     }
 }, {
@@ -263,7 +268,7 @@ async function seedData() {
         await PagesManager.sync();
         await ManagerViewAccess.sync();
 
-        // Seed users
+
         const userCount = await User.count();
         if (userCount > 0) {
             console.log('Users table is not empty, skipping seeding.');
@@ -300,7 +305,8 @@ async function seedData() {
                     active,
                     manager_view_enabled,
                     manager_nav_collapsed,
-                    password: row.password
+                    password: row.password,
+                    selected_channel: null
                 });
             }
 
@@ -312,7 +318,7 @@ async function seedData() {
             }
         }
 
-        // Seed pages_staff
+
         const pagesStaffCount = await PagesStaff.count();
         if (pagesStaffCount > 0) {
             console.log('PagesStaff table is not empty, skipping seeding.');
